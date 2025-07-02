@@ -1,5 +1,7 @@
 import datetime
 from pathlib import Path
+
+from django.contrib.auth import get_user_model
 from dotenv import load_dotenv
 
 import os
@@ -133,3 +135,8 @@ DJOSER = {
     "PASSWORD_RESET_CONFIRM_URL": "auth/reset/confirm/(uid)/(token)/",
     "TOKEN_MODEL": None,
 }
+
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+
+AUTH_USER_MODEL = "users.User"
