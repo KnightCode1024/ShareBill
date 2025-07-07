@@ -1,10 +1,9 @@
+import os
 import datetime
 from pathlib import Path
 
-from django.contrib.auth import get_user_model
 from dotenv import load_dotenv
 
-import os
 
 load_dotenv()
 
@@ -35,10 +34,13 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     # LIBS
     "rest_framework",
+    "rest_framework.authtoken",
     "rest_framework_json_api",
     "djoser",
     # APPS
     "api.v1.users.apps.UsersConfig",
+    "api.v1.events.apps.EventsConfig",
+    "api.v1.receipts.apps.ReceiptsConfig",
 ]
 
 MIDDLEWARE = [
@@ -129,7 +131,7 @@ JWT_AUTH = {
 
 DJOSER = {
     "SEND_ACTIVATION_EMAIL": True,
-    # 'SEND_CONFIRMATION_EMAIL': True,
+    "SEND_CONFIRMATION_EMAIL": True,
     "ACTIVATION_URL": "auth/activate/(uid)/(token)/",
     "PASSWORD_RESET_SHOW_EMAIL_NOT_FOUND": True,
     "PASSWORD_RESET_CONFIRM_URL": "auth/reset/confirm/(uid)/(token)/",
@@ -140,3 +142,27 @@ MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 AUTH_USER_MODEL = "users.User"
+
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+
+EMAIL_HOST = os.getenv("EMAIL_HOST")
+EMAIL_PORT = os.getenv("EMAIL_PORT")
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
+EMAIL_USE_SSL = os.getenv("EMAIL_USE_SSL") in (
+    "1",
+    "t",
+    "y",
+    "T",
+    "Y",
+    "Yes",
+    "yes",
+    "True",
+    "true",
+)
+
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+SERVER_EMAIL = EMAIL_HOST_USER
+EMAIL_ADMIN = EMAIL_HOST_USER
+
+PROVERKA_CHEKA_API_TOKEN = os.getenv("PROVERKA_CHEKA_API_TOKEN")

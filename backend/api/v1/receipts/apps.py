@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class EventsConfig(AppConfig):
+class ReceiptsConfig(AppConfig):
     default_auto_field = "django.db.models.BigAutoField"
-    name = "api.v1.events"
+    name = "api.v1.receipts"

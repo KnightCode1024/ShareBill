@@ -1,3 +1,5 @@
+from django.conf import settings
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include, re_path
 from rest_framework_simplejwt.views import (
@@ -10,6 +12,12 @@ urlpatterns = [
     path("api/", include("api.urls")),
     path("api-auth/", include("rest_framework.urls")),
     re_path(r"^auth/", include("djoser.urls")),
+    path("auth/", include("djoser.urls.jwt")),
     path("auth/jwt/create/", TokenObtainPairView.as_view(), name="jwt-create"),
     path("auth/jwt/refresh/", TokenRefreshView.as_view(), name="jwt-refresh"),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(
+        settings.MEDIA_URL, document_root=settings.MEDIA_ROOT
+    )
