@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from api.v1.events.models import ReceiptItem, EventGroup, Event
+from api.v1.events.models import ReceiptItem, EventGroup, Event, Receipt
 
 
 @admin.register(Event)
@@ -15,4 +15,9 @@ class EventGroupAdmin(admin.ModelAdmin):
 
 @admin.register(ReceiptItem)
 class ReceiptItemAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(Receipt)
+class ReceiptAdmin(admin.ModelAdmin):
     pass

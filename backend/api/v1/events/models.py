@@ -3,8 +3,6 @@ import uuid
 from django.contrib.auth import get_user_model
 from django.db import models
 
-# from api.v1.receipts.models import Receipt
-
 
 class ReceiptItem(models.Model):
     name = models.CharField(
@@ -27,19 +25,49 @@ class ReceiptItem(models.Model):
         verbose_name="Общая сумма",
     )
 
-    event = models.ForeignKey(  # Связь с событием
+    event = models.ForeignKey(
         "Event",
         on_delete=models.CASCADE,
         related_name="items",
+        verbose_name="Мероприятие",
+    )
+    owners = models.ManyToManyField(
+        get_user_model(),
+        blank=True,
+        related_name="owners",
+        verbose_name="Владелец позиции",
+    )
+
+
+class Receipt(models.Model):
+    total = models.DecimalField(
+        max_digits=10,
+        decimal_places=3,
+        null=True,
+        verbose_name="Общая сумма",
+    )
+    qr_raw = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        verbose_name="Сырой чек",
+    )
+    items = models.ManyToManyField(
+        ReceiptItem,
+        blank=True,
+        verbose_name="Позиции",
+    )
+    receipt_img = models.ImageField(
+        verbose_name="Фото чека",
+        blank=True,
+        null=True,
     )
 
 
 class EventGroup(models.Model):
     name = models.CharField(
         max_length=255,
-    )
-    description = models.TextField(
-        blank=True,
+        verbose_name="Название группы",
     )
     created_at = models.DateTimeField(
         auto_now_add=True,
@@ -48,44 +76,42 @@ class EventGroup(models.Model):
         get_user_model(),
         related_name="event_groups",
         blank=True,
+        verbose_name="Участники",
     )
-
-    def __str__(self):
-        return self.name
 
 
 class Event(models.Model):
     name = models.CharField(
         max_length=255,
+        verbose_name="Название мероприятия",
     )
     organizer = models.ForeignKey(
         get_user_model(),
         on_delete=models.SET_NULL,
         null=True,
         related_name="organized_events",
+        verbose_name="Огранизатор мероприятия",
     )
     created_at = models.DateTimeField(
-        auto_now_add=True,
+        auto_now_add=True, verbose_name="Создано в"
     )
     is_active = models.BooleanField(
         default=True,
+        verbose_name="Активен",
     )
-    total_amount = models.DecimalField(
-        max_digits=10,
-        decimal_places=2,
-        default=0,
-    )
-    tips_percentage = models.PositiveIntegerField(
+    tips = models.PositiveIntegerField(
         null=True,
         blank=True,
         default=0,
+        verbose_name="Чаевые",
     )
     group = models.ForeignKey(
         EventGroup,
         on_delete=models.CASCADE,
-        related_name="events",
+        related_name="group",
         blank=True,
         null=True,
+        verbose_name="Группа",
     )
     invite_token = models.UUIDField(
         default=uuid.uuid4,
@@ -93,17 +119,14 @@ class Event(models.Model):
         unique=True,
         null=True,
         blank=True,
-    )
-    receipt_image = models.ImageField(
-        upload_to="receipts",
-        blank=False,
-        null=False,
-    )
-    qr_raw = models.CharField(
-        max_length=255,
-        blank=True,
-        null=True,
+        verbose_name="Код приглашения",
     )
 
-    def __str__(self):
-        return self.name
+    receipt = models.OneToOneField(
+        Receipt,
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+        related_name="receipt",
+        verbose_name="Чек",
+    )

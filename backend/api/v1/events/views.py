@@ -1,19 +1,26 @@
 from rest_framework import status
+from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.generics import (
     CreateAPIView,
     RetrieveAPIView,
     RetrieveUpdateDestroyAPIView,
+    UpdateAPIView,
 )
 from rest_framework.response import Response
 
-from api.v1.events.permissions import IsEventOrganizer
+
 from api.v1.events.serializers import (
     AddEventSerializer,
     EventSerializer,
     JoinGroupResponseSerializer,
+    ReceiptSerializer,
+    ReceiptItemSerializer,
+    SelectItemSerializer,
+    ReceiptNameItemSerializer,
 )
-from api.v1.events.models import Event
+from api.v1.events.models import Event, Receipt, ReceiptItem
+from api.v1.events.permissions import IsEventParticipants, IsEventOrganizer
 
 
 class AddEventView(CreateAPIView):
@@ -28,7 +35,7 @@ class AddEventView(CreateAPIView):
 class EventView(RetrieveUpdateDestroyAPIView):
     queryset = Event.objects.all()
     serializer_class = EventSerializer
-    permission_classes = [IsAuthenticated, IsEventOrganizer]
+    permission_classes = [IsEventOrganizer]
 
 
 class JoinGroupView(RetrieveAPIView):
@@ -53,3 +60,15 @@ class JoinGroupView(RetrieveAPIView):
             {"error": "У этого мероприятия нет группы"},
             status=status.HTTP_400_BAD_REQUEST,
         )
+
+
+class ReceiptsPositions(RetrieveAPIView):
+    queryset = Receipt.objects.all()
+    serializer_class = ReceiptSerializer
+    permission_classes = [IsEventParticipants]
+
+
+class SelectItemView(RetrieveUpdateDestroyAPIView):
+    queryset = Receipt.objects.all()
+    serializer_class = ReceiptNameItemSerializer
+    # permission_classes = [IsEventParticipants]
